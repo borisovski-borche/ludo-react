@@ -1,11 +1,6 @@
 import { PlayerToken } from "./Models/PlayerToken.model";
 import { Player } from "./Models/Player.model";
 
-//Math formula for the dice roll
-export const generateDiceRoll = () => {
-  return Math.random() * 6 + 1;
-};
-
 //logic for generation all the tokens in p
 const playerData = [
   { startingPosition: 30, color: "yellow" },
@@ -24,24 +19,29 @@ export const players = playerData.map(
       playerObj.startingPosition
     )
 );
+//Math formula for the dice roll
+export const generateDiceRoll = () => {
+  return Math.random() * 6 + 1;
+};
+//calculating old positon
+const calcOldPositon = (oldBoard, token) => {
+  return oldBoard.findIndex(boardToken => boardToken?.id === token.id);
+};
 
 //logic for manipulating the rendered board
-export const changeTokenPositionRender = (
-  oldBoard,
-  token,
-  oldPosition,
-  diceRoll
-) => {
-  const newBoard = [...oldBoard];
+export const changeTokenPositionRender = (oldBoard, token, diceRoll) => {
+  const oldPosition = calcOldPositon(oldBoard, token);
+
   token.changePosition(diceRoll);
 
   const position = oldPosition + diceRoll > 39 ? oldPosition - 40 : oldPosition;
 
-  const targetPositionToken = newBoard[position + diceRoll];
+  const targetPositionToken = oldBoard[position + diceRoll];
 
+  const newBoard = [...oldBoard];
   if (targetPositionToken) {
     if (targetPositionToken.playerColor === token.playerColor) {
-      return newBoard;
+      return oldBoard;
     }
     targetPositionToken.resetPositon();
     newBoard[position] = undefined;
@@ -55,8 +55,15 @@ export const changeTokenPositionRender = (
 };
 
 export const initialiseTokenRender = (oldBoard, player, token, diceRoll) => {
-  if (diceRoll !== 6 || oldBoard[player.startingPosition]) {
+  if (diceRoll !== 6) {
     return oldBoard;
+  }
+  if (oldBoard[player.startingPosition]) {
+    if (oldBoard[player.startingPosition].playerColor === player.color) {
+      return oldBoard;
+    } else {
+      oldBoard[player.startingPosition].resetPositon();
+    }
   }
 
   const newBoard = [...oldBoard];
@@ -70,13 +77,10 @@ export const parkTokenRender = (oldBoard, token, oldPosition, diceRoll) => {
     return oldBoard;
   }
 
-  console.log(diceRoll);
-  console.log(oldPosition);
-  console.log(token.position);
-
   const newBoard = [...oldBoard];
 
   token.parkToken(token.position + diceRoll - 40);
+  token.changePosition(diceRoll);
 
   newBoard[oldPosition] = undefined;
   return newBoard;

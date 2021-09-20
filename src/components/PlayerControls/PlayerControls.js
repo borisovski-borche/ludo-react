@@ -29,7 +29,6 @@ const PlayerControls = props => {
         <button
           disabled={!disabled || (diceRoll && diceRoll < 6)}
           onClick={e => {
-            // setDiceRoll(Math.random() + 6);
             setDiceRoll(generateDiceRoll());
           }}
         >
