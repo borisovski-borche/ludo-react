@@ -1,0 +1,19 @@
+.board {
+  width: 900px;
+  height: 900px;
+  border: 1.5px solid black;
+  margin: 20px;
+  display: grid;
+  grid-template:
+    "p1 p1 . . f38 f39 f0 . . p2 p2"
+    "p1 p1 . . f37 ph2 f1 . . p2 p2"
+    ". . . . f36 ph2 f2 . . . . "
+    ". . . . f35 ph2 f3 . . . . "
+    "f30 f31 f32 f33 f34 ph2 f4 f5 f6 f7 f8 "
+    "f29 ph1 ph1 ph1 ph1 . ph3 ph3 ph3 ph3 f9 "
+    "f28 f27 f26 f25 f24 ph4 f14 f13 f12 f11 f10 "
+    ". . . . f23 ph4 f15 . . . . "
+    ". . . . f22 ph4 f16 . . . ."
+    "p4 p4 . . f21 ph4 f17 . . p3 p3"
+    "p4 p4 . . f20 f19 f18 . . p3 p3";
+}

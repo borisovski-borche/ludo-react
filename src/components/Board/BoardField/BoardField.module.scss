@@ -1,0 +1,13 @@
+.board_field {
+  height: 65px;
+  width: 65px;
+  margin: 5px;
+  border: 1.5px solid black;
+  border-radius: 50%;
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

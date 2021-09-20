@@ -1,0 +1,27 @@
+.player_controls {
+  width: 200px;
+  border: 1px solid black;
+  margin: 20px;
+
+  h2 {
+    margin: 0;
+    margin-bottom: 20px;
+  }
+}
+
+.dice_controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  p {
+    font-size: 2rem;
+    margin: 0;
+    padding: 0 20px;
+  }
+
+  button {
+    width: 50%;
+    margin: 3px;
+  }
+}

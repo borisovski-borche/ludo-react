@@ -1,0 +1,19 @@
+.player_home {
+  display: flex;
+}
+
+.player_yellow {
+  flex-direction: row;
+}
+
+.player_green {
+  flex-direction: column;
+}
+
+.player_red {
+  flex-direction: row-reverse;
+}
+
+.player_blue {
+  flex-direction: column-reverse;
+}

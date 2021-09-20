@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+  width: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  display: grid;
+  grid-template:
+    "p1c br br  p2c"
+    ". br br  ."
+    "p4c br br  p3c";
+}
