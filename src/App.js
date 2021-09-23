@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
 
 import "./App.scss";
 import Board from "./components/Board/Board";
@@ -9,58 +9,68 @@ import {
   initialiseTokenRender,
   parkTokenRender,
   players,
+  moveValidator,
 } from "./game-logic/game.service";
 
 const boardArr = Array(40);
 boardArr.fill(undefined, 0, 40);
 
+//manual assignment for testing purposes
 // players[0].tokens[0].inPlay = true;
-// players[0].tokens[0].position = 35;
-
 // players[0].tokens[1].inPlay = true;
-// players[0].tokens[1].position = 36;
+// players[0].tokens[2].inPlay = true;
+// players[0].tokens[3].inPlay = true;
 
-// players[1].tokens[1].inPlay = true;
 // players[1].tokens[0].inPlay = true;
-// players[1].tokens[2].inPlay = true;
-// players[1].tokens[3].inPlay = true;
-
-// players[2].tokens[1].inPlay = true;
-// players[2].tokens[0].inPlay = true;
-// players[2].tokens[2].inPlay = true;
-// players[2].tokens[3].inPlay = true;
-
-// boardArr[31] = players[1].tokens[0];
-// boardArr[32] = players[1].tokens[1];
-// boardArr[33] = players[1].tokens[2];
-// boardArr[34] = players[1].tokens[3];
-
-// boardArr[35] = players[2].tokens[0];
-// boardArr[36] = players[2].tokens[1];
-// boardArr[37] = players[2].tokens[2];
-// boardArr[38] = players[2].tokens[3];
-
-// players[1].tokens[1].position = 37;
 // players[1].tokens[1].inPlay = true;
+// players[1].tokens[2].inPlay = true;
 
-// boardArr[37] = players[1].tokens[1];
+// boardArr[0] = players[1].tokens[0];
+// boardArr[1] = players[1].tokens[1];
+// boardArr[38] = players[1].tokens[2];
+
+// boardArr[37] = players[0].tokens[0];
+// boardArr[36] = players[0].tokens[1];
+// boardArr[35] = players[0].tokens[2];
+// boardArr[34] = players[0].tokens[3];
 
 function App() {
   const [board, updateBoard] = useState(boardArr);
   const [selectedToken, setSelectedToken] = useState(null);
   const [diceRoll, setDiceRoll] = useState(null);
-  const [currentPlayer, changeCurrentPlayer] = useState(players[1]);
+  const [currentPlayer, changeCurrentPlayer] = useState(players[0]);
+
+  useEffect(() => {}, [selectedToken]);
 
   useEffect(() => {
-    console.log("test");
-    if (diceRoll > 6) {
-      setDiceRoll(6);
+    let timer;
+
+    if (diceRoll !== null) {
+      const isValid = moveValidator(board, diceRoll, currentPlayer);
+
+      if (!isValid) {
+        timer = setTimeout(() => {
+          onPassTurn();
+        }, 1000);
+      }
+
+      if (isValid === "start") {
+        timer = setTimeout(() => {
+          onPassTurn();
+        }, 1000);
+      }
     }
-  }, [diceRoll]);
 
-  useEffect(() => {
-    console.log(selectedToken);
-  }, [selectedToken]);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [diceRoll, board, currentPlayer]);
+
+  const onPlayerRoll = useCallback(roll => {
+    if (!roll) return;
+
+    setDiceRoll(Math.floor(roll));
+  }, []);
 
   const onPassTurn = () => {
     changeCurrentPlayer(prevPlayer => {
@@ -72,22 +82,19 @@ function App() {
       }
       return players[index + 1];
     });
+    setDiceRoll(null);
   };
 
   const parkToken = (clickedToken, newPosition) => {
-    console.log("above the check");
-
-    if (clickedToken) {
+    if (clickedToken?.id === selectedToken?.id) {
       return;
     }
 
-    console.log("below the check");
-    console.log(selectedToken);
+    if (!clickedToken && !selectedToken) {
+      return;
+    }
 
-    if (selectedToken) {
-      console.log("in the bug");
-      console.log(selectedToken.playerColor);
-      console.log(currentPlayer.color);
+    if (selectedToken && diceRoll && !clickedToken) {
       if (selectedToken.playerColor === currentPlayer.color) {
         const oldPosition = board.findIndex(
           boardToken => boardToken?.id === selectedToken.id
@@ -95,11 +102,18 @@ function App() {
         updateBoard(oldBoard =>
           parkTokenRender(oldBoard, selectedToken, oldPosition, diceRoll)
         );
-        setDiceRoll(null);
+        if (!clickedToken) {
+          setDiceRoll(null);
+        }
         if (diceRoll < 6) {
           onPassTurn();
         }
       }
+    }
+
+    if (clickedToken) {
+      setSelectedToken(clickedToken);
+      return;
     }
   };
 
@@ -110,17 +124,18 @@ function App() {
     }
 
     if (clickedToken?.id === selectedToken?.id) {
-      console.log("here 1");
       return;
     }
 
     if (!clickedToken && !selectedToken) {
-      console.log("here 3");
       return;
     }
 
     if (selectedToken) {
-      if (selectedToken.playerColor === currentPlayer.color) {
+      if (
+        selectedToken.playerColor === currentPlayer.color &&
+        selectedToken.playerColor !== clickedToken?.playerColor
+      ) {
         const oldPosition = board.findIndex(
           boardToken => boardToken?.id === selectedToken.id
         );
@@ -147,6 +162,10 @@ function App() {
   };
 
   const moveTokenToBoard = (clickedToken, position) => {
+    if (diceRoll < 6) {
+      return;
+    }
+
     updateBoard(oldBoard =>
       initialiseTokenRender(oldBoard, currentPlayer, clickedToken, diceRoll)
     );
@@ -166,7 +185,7 @@ function App() {
         ></Board>
         {players.map((player, i) => (
           <PlayerControls
-            onDiceRoll={setDiceRoll}
+            onDiceRoll={onPlayerRoll}
             onPassTurn={onPassTurn}
             key={player.color}
             player={player}

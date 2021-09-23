@@ -25,3 +25,23 @@
     margin: 3px;
   }
 }
+
+.diceImageContainer {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  border: 2px solid black;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    font-size: 1.5rem;
+    width: 80%;
+  }
+
+  img {
+    width: 100%;
+  }
+}

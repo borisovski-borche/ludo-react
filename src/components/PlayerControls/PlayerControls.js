@@ -7,13 +7,13 @@ const PlayerControls = props => {
 
   const [diceRoll, setDiceRoll] = useState(null);
 
-  const disabled = player.color === currentPlayer.color;
+  const isPlayerTurn = player.color === currentPlayer.color;
 
   useEffect(() => {
     if (diceRoll > 6) {
       onDiceRoll(diceRoll);
     } else {
-      onDiceRoll(Math.floor(diceRoll));
+      onDiceRoll(diceRoll);
     }
   }, [diceRoll, onDiceRoll]);
 
@@ -25,9 +25,18 @@ const PlayerControls = props => {
     <div className={classes.player_controls} style={style}>
       <h2>{player.color}</h2>
       <div className={classes.dice_controls}>
-        {diceRoll && <p>{Math.floor(diceRoll)}</p>}
+        <div className={classes.diceImageContainer}>
+          {!diceRoll && isPlayerTurn && <p>ROLL!</p>}
+          {!diceRoll && !isPlayerTurn && <p>WAIT!</p>}
+          {diceRoll && (
+            <img
+              src={`images/dice-${Math.floor(diceRoll)}.png`}
+              alt={`dice-${Math.floor(diceRoll)}`}
+            />
+          )}
+        </div>
         <button
-          disabled={!disabled || (diceRoll && diceRoll < 6)}
+          disabled={!isPlayerTurn || (diceRoll && diceRoll < 6)}
           onClick={e => {
             setDiceRoll(generateDiceRoll());
           }}
@@ -35,7 +44,7 @@ const PlayerControls = props => {
           ROLL!
         </button>
         <button
-          disabled={!disabled}
+          disabled={!isPlayerTurn}
           onClick={e => {
             setDiceRoll(null);
             onPassTurn();
